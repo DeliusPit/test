@@ -1,0 +1,40 @@
+version: 25
+jobs:
+- name: push
+  steps:
+  - !PushRepository
+    name: push
+    remoteUrl: https://github.com/DeliusPit/test
+    passwordSecret: access-token
+    force: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  triggers:
+  - !BranchUpdateTrigger {}
+  - !TagCreateTrigger {}
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
+- name: pull
+  steps:
+  - !PullRepository
+    name: pull
+    remoteUrl: https://github.com/DeliusPit/test
+    syncToChildProject: false
+    passwordSecret: access-token
+    refs: refs/heads/* refs/tags/*
+    withLfs: false
+    force: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
+- name: sync
+  triggers:
+  - !ScheduleTrigger
+    cronExpression: 0 0 1 * * ?
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
